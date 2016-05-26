@@ -25,7 +25,7 @@ try:
 except AttributeError:
     YES, NO = (Emoji.THUMBS_UP_SIGN, Emoji.THUMBS_DOWN_SIGN)
 
-NOW, SOON, LATER, NEVER = "now", "soon", "later", "never"
+NOW, SOON, LATER, NEVER = "now", "<5", ">60", "never"
 
 # States are saved in a dict that maps chat_id -> state
 last = dict()
@@ -49,7 +49,7 @@ def render_ready(users):
         fname = user['user'].first_name
         lname = user['user'].last_name
         state = user['state']
-        msg += fname + ' ' + lname + ': ' + state
+        msg += fname + ' ' + lname + ': ' + state + "\n"
     return msg
 
 def ready_check(bot, update):
