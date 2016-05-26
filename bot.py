@@ -42,11 +42,26 @@ reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(NOW, callback_data=NO
                                         InlineKeyboardButton(NEVER, callback_data=NEVER)
                                             ]])
 
+def render_ready(users):
+    msg = "READY CHECK\n"
+    for key in users:
+        user = users[key]
+        fname = user['user'].first_name
+        lname = user['user'].last_name
+        state = user['state']
+        msg += fname + ' ' + lname + ': ' + state
+    return msg
+
 def ready_check(bot, update):
     chat_id = update.message.chat_id
     user_id = update.message.from_user.id
-    state[chat_id] = dict()
-    bot.sendMessage(chat_id, text="Are you ready?", reply_markup=reply_markup)
+    if chat_id in state:
+        for key in state[chat_id]:
+            state[chat_id][key]['state'] = '???'
+    else:
+        state[chat_id] = dict()
+
+    bot.sendMessage(chat_id, text=render_ready(state[chat_id]), reply_markup=reply_markup)
 
 
 def confirm_value(bot, update):
@@ -57,18 +72,19 @@ def confirm_value(bot, update):
     user_state = state.get(user_id, MENU)
     user_context = context.get(user_id, None)
 
-    print('chat ' + str(chat_id))
-    print('user ' + str(user_id))
     #bot.answerCallbackQuery(query.id, text="Ok!")
-    state[chat_id][user_id] = text
+    state[chat_id][user_id] = dict()
+    state[chat_id][user_id]['user'] = query.from_user
+    state[chat_id][user_id]['state'] = text
+
     #values[user_id] = user_context
-    bot.editMessageText(text="Changed value to %s." % text,
+    bot.editMessageText(text=render_ready(state[chat_id]),
                         chat_id=chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)
 
 def help(bot, update):
-    bot.sendMessage(update.message.chat_id, text="Use /set to test this bot.")
+    bot.sendMessage(update.message.chat_id, text="Use /ready to initiate a ready check")
 
 
 def error(bot, update, error):
