@@ -25,7 +25,7 @@ try:
 except AttributeError:
     YES, NO = (Emoji.THUMBS_UP_SIGN, Emoji.THUMBS_DOWN_SIGN)
 
-NOW, SOON, LATER, NEVER = "now", "<5", ">60", "never"
+NOW, SOON, LATER, NEVER = "<5", "<30", "<60", "nope"
 
 # States are saved in a dict that maps chat_id -> state
 last = dict()
@@ -43,13 +43,13 @@ reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(NOW, callback_data=NO
                                             ]])
 
 def render_ready(users):
-    msg = "READY CHECK\n"
+    msg = "*READY CHECK*\n"
     for key in users:
         user = users[key]
         fname = user['user'].first_name
-        lname = user['user'].last_name
+        #lname = user['user'].last_name
         state = user['state']
-        msg += fname + ' ' + lname + ': ' + state + "\n"
+        msg += fname + ': ' + state + "\n"
     return msg
 
 def ready_check(bot, update):
@@ -61,7 +61,7 @@ def ready_check(bot, update):
     else:
         state[chat_id] = dict()
 
-    bot.sendMessage(chat_id, text=render_ready(state[chat_id]), reply_markup=reply_markup)
+    bot.sendMessage(chat_id, text=render_ready(state[chat_id]), reply_markup=reply_markup, parse_mode='markdown')
 
 
 def confirm_value(bot, update):
@@ -81,6 +81,7 @@ def confirm_value(bot, update):
     bot.editMessageText(text=render_ready(state[chat_id]),
                         chat_id=chat_id,
                         message_id=query.message.message_id,
+                        parse_mode='markdown',
                         reply_markup=reply_markup)
 
 def help(bot, update):
