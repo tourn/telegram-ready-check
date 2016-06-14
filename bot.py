@@ -5,6 +5,7 @@
 # the state_machine_bot.py example
 # This program is dedicated to the public domain under the CC0 license.
 
+import datetime
 import logging
 from telegram import Emoji, ForceReply, InlineKeyboardButton, \
     InlineKeyboardMarkup
@@ -73,6 +74,14 @@ def confirm_value(bot, update):
     user_context = context.get(user_id, None)
 
     #bot.answerCallbackQuery(query.id, text="Ok!")
+    if text[:1] == '<':
+        time = datetime.datetime.now()
+        mins = int(text[1:])
+        #the added 6 hours are a stupid timezone hack
+        time = time + datetime.timedelta(minutes=mins, hours=6)
+        time = str(time.time())
+        text = text + ' ( -> ' + time[:time.find(':',3)] + ' )'
+
     state[chat_id][user_id] = dict()
     state[chat_id][user_id]['user'] = query.from_user
     state[chat_id][user_id]['state'] = text
