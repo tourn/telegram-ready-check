@@ -77,7 +77,6 @@ def confirm_value(bot, update):
     if text[:1] == '<':
         time = datetime.datetime.now()
         mins = int(text[1:])
-        #the added 6 hours are a stupid timezone hack
         time = time + datetime.timedelta(minutes=mins, hours=6)
         time = str(time.time())
         text = text + ' ( -> ' + time[:time.find(':',3)] + ' )'
