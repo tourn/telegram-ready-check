@@ -60,6 +60,8 @@ def ready_check(bot, update):
     user_id = update.message.from_user.id
     if chat_id in state:
         for key in state[chat_id]:
+            if key == 'message':
+                break
             state[chat_id][key]['state'] = '???'
     else:
         state[chat_id] = dict()
@@ -70,7 +72,6 @@ def ready_check(bot, update):
     state[chat_id]['message'] = msg.message_id
 
 def in_response(bot, update):
-    print("U WOT MATE")
     chat_id = update.message.chat_id
     user_id = update.message.from_user.id
     if chat_id in state:
