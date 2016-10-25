@@ -80,6 +80,7 @@ def in_response(bot, update):
             text = text + render_in(int(text))
         except:
             pass
+        state[chat_id][user_id] = dict()
         state[chat_id][user_id]['user'] = update.message.from_user
         state[chat_id][user_id]['state'] = text
     else:
