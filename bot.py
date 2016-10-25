@@ -46,6 +46,8 @@ reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(NOW, callback_data=NO
 def render_ready(users):
     msg = "*READY CHECK*\n"
     for key in users:
+        if key == 'message':
+            break
         user = users[key]
         fname = user['user'].first_name
         #lname = user['user'].last_name
@@ -62,7 +64,32 @@ def ready_check(bot, update):
     else:
         state[chat_id] = dict()
 
-    bot.sendMessage(chat_id, text=render_ready(state[chat_id]), reply_markup=reply_markup, parse_mode='markdown')
+
+    msg = bot.sendMessage(chat_id, text=render_ready(state[chat_id]), reply_markup=reply_markup, parse_mode='markdown')
+
+    state[chat_id]['message'] = msg.message_id
+
+def in_response(bot, update):
+    print("U WOT MATE")
+    chat_id = update.message.chat_id
+    user_id = update.message.from_user.id
+    if chat_id in state:
+        text = update.message.text.split(' ',1)[1]
+        try:
+            text = text + render_in(int(text))
+        except:
+            pass
+        state[chat_id][user_id]['user'] = update.message.from_user
+        state[chat_id][user_id]['state'] = text
+    else:
+        state[chat_id] = dict()
+        bot.sendMessage(chat_id, text='Start a check with /ready first')
+
+    bot.editMessageText(text=render_ready(state[chat_id]),
+                        chat_id=chat_id,
+                        message_id=state[chat_id]['message'],
+                        parse_mode='markdown',
+                        reply_markup=reply_markup)
 
 
 def confirm_value(bot, update):
@@ -75,11 +102,7 @@ def confirm_value(bot, update):
 
     #bot.answerCallbackQuery(query.id, text="Ok!")
     if text[:1] == '<':
-        time = datetime.datetime.now()
-        mins = int(text[1:])
-        time = time + datetime.timedelta(minutes=mins, hours=6)
-        time = str(time.time())
-        text = text + ' ( -> ' + time[:time.find(':',3)] + ' )'
+        text = text + render_in(int(text[1:]))
 
     state[chat_id][user_id] = dict()
     state[chat_id][user_id]['user'] = query.from_user
@@ -91,6 +114,13 @@ def confirm_value(bot, update):
                         message_id=query.message.message_id,
                         parse_mode='markdown',
                         reply_markup=reply_markup)
+
+def render_in(mins):
+    time = datetime.datetime.now()
+    time = time + datetime.timedelta(minutes=mins, hours=6)
+    time = str(time.time())
+    return ' ( -> ' + time[:time.find(':',3)] + ' )'
+
 
 def help(bot, update):
     bot.sendMessage(update.message.chat_id, text="Use /ready to initiate a ready check")
@@ -104,6 +134,7 @@ updater = Updater(properties.TELEGRAM_TOKEN)
 
 # The command
 updater.dispatcher.add_handler(CommandHandler('ready', ready_check))
+updater.dispatcher.add_handler(CommandHandler('in', in_response))
 # The confirmation
 updater.dispatcher.add_handler(CallbackQueryHandler(confirm_value))
 updater.dispatcher.add_handler(CommandHandler('start', help))
