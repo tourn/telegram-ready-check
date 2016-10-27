@@ -49,8 +49,6 @@ reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(NOW, callback_data=NO
 def render_ready(users):
     msg = "*READY CHECK*\n"
     for key in users:
-        if key == 'message':
-            continue
         user = users[key]
         fname = user['user'].first_name
         #lname = user['user'].last_name
@@ -62,15 +60,14 @@ def ready_check(bot, update):
     chat_id = update.message.chat_id
     user_id = update.message.from_user.id
     if chat_id in state:
-        for key in state[chat_id]:
-            if key == 'message':
-                continue
-            state[chat_id][key]['state'] = '???'
+        for key in state[chat_id]['users']:
+            state[chat_id]['users'][key]['state'] = '???'
     else:
         state[chat_id] = dict()
+        state[chat_id]['users'] = dict()
 
 
-    msg = bot.sendMessage(chat_id, text=render_ready(state[chat_id]), reply_markup=reply_markup, parse_mode='markdown')
+    msg = bot.sendMessage(chat_id, text=render_ready(state[chat_id]['users']), reply_markup=reply_markup, parse_mode='markdown')
 
     state[chat_id]['message'] = msg.message_id
 
@@ -83,16 +80,17 @@ def in_response(bot, update):
             text = text + render_in(int(text))
         except:
             pass
-        state[chat_id][user_id] = dict()
-        state[chat_id][user_id]['user'] = update.message.from_user
-        state[chat_id][user_id]['state'] = text
+        state[chat_id]['users'][user_id] = dict()
+        state[chat_id]['users'][user_id]['user'] = update.message.from_user
+        state[chat_id]['users'][user_id]['state'] = text
     else:
         state[chat_id] = dict()
+        state[chat_id]['users'] = dict()
         bot.sendMessage(chat_id, text='Start a check with /ready first')
 
     print("###")
     pp.pprint(state)
-    bot.editMessageText(text=render_ready(state[chat_id]),
+    bot.editMessageText(text=render_ready(state[chat_id]['users']),
                         chat_id=chat_id,
                         message_id=state[chat_id]['message'],
                         parse_mode='markdown',
@@ -111,14 +109,14 @@ def confirm_value(bot, update):
     if text[:1] == '<':
         text = text + render_in(int(text[1:]))
 
-    state[chat_id][user_id] = dict()
-    state[chat_id][user_id]['user'] = query.from_user
-    state[chat_id][user_id]['state'] = text
+    state[chat_id]['users'][user_id] = dict()
+    state[chat_id]['users'][user_id]['user'] = query.from_user
+    state[chat_id]['users'][user_id]['state'] = text
 
     #values[user_id] = user_context
     print("###")
     pp.pprint(state)
-    bot.editMessageText(text=render_ready(state[chat_id]),
+    bot.editMessageText(text=render_ready(state[chat_id]['users']),
                         chat_id=chat_id,
                         message_id=query.message.message_id,
                         parse_mode='markdown',
