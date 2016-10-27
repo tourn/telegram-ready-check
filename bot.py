@@ -7,6 +7,9 @@
 
 import datetime
 import logging
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+
 from telegram import Emoji, ForceReply, InlineKeyboardButton, \
     InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, \
@@ -87,6 +90,8 @@ def in_response(bot, update):
         state[chat_id] = dict()
         bot.sendMessage(chat_id, text='Start a check with /ready first')
 
+    print("###")
+    pp.pprint(state)
     bot.editMessageText(text=render_ready(state[chat_id]),
                         chat_id=chat_id,
                         message_id=state[chat_id]['message'],
@@ -111,6 +116,8 @@ def confirm_value(bot, update):
     state[chat_id][user_id]['state'] = text
 
     #values[user_id] = user_context
+    print("###")
+    pp.pprint(state)
     bot.editMessageText(text=render_ready(state[chat_id]),
                         chat_id=chat_id,
                         message_id=query.message.message_id,
