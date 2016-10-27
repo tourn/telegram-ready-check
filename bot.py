@@ -50,7 +50,7 @@ def render_ready(users):
     msg = "*READY CHECK*\n"
     for key in users:
         if key == 'message':
-            break
+            continue
         user = users[key]
         fname = user['user'].first_name
         #lname = user['user'].last_name
@@ -64,7 +64,7 @@ def ready_check(bot, update):
     if chat_id in state:
         for key in state[chat_id]:
             if key == 'message':
-                break
+                continue
             state[chat_id][key]['state'] = '???'
     else:
         state[chat_id] = dict()
