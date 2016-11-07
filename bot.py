@@ -7,6 +7,7 @@
 
 import datetime
 import logging
+from pytz import timezone
 
 from telegram import Emoji, ForceReply, InlineKeyboardButton, \
     InlineKeyboardMarkup
@@ -20,6 +21,8 @@ import properties
 
 # Define the different states a chat can be in
 MENU, AWAIT_CONFIRMATION, AWAIT_INPUT = range(3)
+
+zurich = timezone('Europe/Zurich')
 
 # Python 2 and 3 unicode differences
 try:
@@ -120,9 +123,9 @@ def confirm_value(bot, update):
 
 def render_in(mins):
     time = datetime.datetime.now()
-    time = time + datetime.timedelta(minutes=mins, hours=6)
-    time = str(time.time())
-    return ' ( -> ' + time[:time.find(':',3)] + ' )'
+    time = time + datetime.timedelta(minutes=mins)
+    loc_time = zurich.localize(time)
+    return ' ( -> ' + loc_time.strftime('%H:%M') + ' )'
 
 
 def help(bot, update):
