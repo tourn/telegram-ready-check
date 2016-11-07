@@ -22,7 +22,7 @@ import properties
 # Define the different states a chat can be in
 MENU, AWAIT_CONFIRMATION, AWAIT_INPUT = range(3)
 
-zurich = timezone('Europe/Zurich')
+local_tz = timezone(properties.TIMEZONE)
 
 # Python 2 and 3 unicode differences
 try:
@@ -124,7 +124,7 @@ def confirm_value(bot, update):
 def render_in(mins):
     time = datetime.datetime.now()
     time = time + datetime.timedelta(minutes=mins)
-    loc_time = zurich.localize(time)
+    loc_time = local_tz.localize(time)
     return ' ( -> ' + loc_time.strftime('%H:%M') + ' )'
 
 
