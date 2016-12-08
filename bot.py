@@ -30,7 +30,7 @@ try:
 except AttributeError:
     YES, NO = (Emoji.THUMBS_UP_SIGN, Emoji.THUMBS_DOWN_SIGN)
 
-NOW, SOON, LATER, NEVER = "<5", "<30", "<60", "nope"
+NOW, SOON, LATER, NEVER = "<5", "<30", "not now", "not today"
 
 # States are saved in a dict that maps chat_id -> state
 last = dict()
@@ -42,7 +42,7 @@ context = dict()
 values = dict()
 
 reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(NOW, callback_data=NOW),
-                                        InlineKeyboardButton(SOON, callback_data=SOON)],
+                                        InlineKeyboardButton(SOON, callback_data=SOON)  ],
                                         [InlineKeyboardButton(LATER, callback_data=LATER),
                                         InlineKeyboardButton(NEVER, callback_data=NEVER)
                                             ]])
@@ -80,7 +80,7 @@ def in_response(bot, update):
         try:
             text = text + render_in(int(text))
         except:
-            pass
+            text = text + render_in2(0)
         state[chat_id]['users'][user_id] = dict()
         state[chat_id]['users'][user_id]['user'] = update.message.from_user
         state[chat_id]['users'][user_id]['state'] = text
@@ -125,7 +125,13 @@ def render_in(mins):
     time = datetime.datetime.now()
     time = time + datetime.timedelta(minutes=mins)
     loc_time = local_tz.localize(time)
-    return ' ( -> ' + loc_time.strftime('%H:%M') + ' )'
+    return ' *( -> ' + loc_time.strftime('%H:%M') + ' )*'
+
+def render_in2(mins):
+    time = datetime.datetime.now()
+    time = time + datetime.timedelta(minutes=mins)
+    loc_time = local_tz.localize(time)
+    return ' _( @ ' + loc_time.strftime('%H:%M') + ' )_'
 
 
 def help(bot, update):
