@@ -10,7 +10,7 @@ import datetime
 import logging
 from pytz import timezone
 
-from telegram import Emoji, ForceReply, InlineKeyboardButton, \
+from telegram import ForceReply, InlineKeyboardButton, \
     InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, \
     CallbackQueryHandler, Filters
@@ -23,12 +23,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 MENU, AWAIT_CONFIRMATION, AWAIT_INPUT = range(3)
 
 local_tz = timezone(os.environ['TIMEZONE'])
-
-# Python 2 and 3 unicode differences
-try:
-    YES, NO = (Emoji.THUMBS_UP_SIGN.decode('utf-8'), Emoji.THUMBS_DOWN_SIGN.decode('utf-8'))
-except AttributeError:
-    YES, NO = (Emoji.THUMBS_UP_SIGN, Emoji.THUMBS_DOWN_SIGN)
 
 NOW, SOON, LATER, NEVER = "<5", "<30", "not now", "not today"
 
