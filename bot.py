@@ -5,6 +5,7 @@
 # the state_machine_bot.py example
 # This program is dedicated to the public domain under the CC0 license.
 
+import os
 import datetime
 import logging
 from pytz import timezone
@@ -17,12 +18,11 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, \
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
 
-import properties
 
 # Define the different states a chat can be in
 MENU, AWAIT_CONFIRMATION, AWAIT_INPUT = range(3)
 
-local_tz = timezone(properties.TIMEZONE)
+local_tz = timezone(os.environ['TIMEZONE'])
 
 # Python 2 and 3 unicode differences
 try:
@@ -142,7 +142,7 @@ def error(bot, update, error):
     logging.warning('Update "%s" caused error "%s"' % (update, error))
 
 # Create the Updater and pass it your bot's token.
-updater = Updater(properties.TELEGRAM_TOKEN)
+updater = Updater(os.environ['TELEGRAM_TOKEN'])
 
 # The command
 updater.dispatcher.add_handler(CommandHandler('ready', ready_check))
