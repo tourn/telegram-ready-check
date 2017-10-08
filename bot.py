@@ -35,6 +35,8 @@ context = dict()
 # Usually, you'd use persistence for this (e.g. sqlite).
 values = dict()
 
+LATECOMER_NOTIFICATION_SECONDS = int(os.getenv("LATECOMER_NOTIFICATION_SECONDS", "60"))
+
 reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(NOW, callback_data=NOW),
                                         InlineKeyboardButton(SOON, callback_data=SOON)  ],
                                         [InlineKeyboardButton(LATER, callback_data=LATER),
@@ -60,6 +62,8 @@ def ready_check(bot, update):
     else:
         state[chat_id] = dict()
         state[chat_id]['users'] = dict()
+
+    state[chat_id]['time'] = datetime.datetime.now()
 
 
     msg = bot.sendMessage(chat_id, text=render_ready(state[chat_id]['users']), reply_markup=reply_markup, parse_mode='markdown')
@@ -99,6 +103,14 @@ def confirm_value(bot, update):
     user_state = state.get(user_id, MENU)
     user_context = context.get(user_id, None)
 
+    checkTime = state[chat_id]['time']
+    time = datetime.datetime.now()
+    checkDistance = (time-checkTime).seconds
+
+    if query.data == NOW and checkDistance > LATECOMER_NOTIFICATION_SECONDS:
+        fname = query.from_user.first_name
+        bot.sendMessage(chat_id, text= fname + ' will be here soon!')
+
     #bot.answerCallbackQuery(query.id, text="Ok!")
     if text[:1] == '<':
         text = text + render_in(int(text[1:]))
@@ -107,8 +119,6 @@ def confirm_value(bot, update):
     state[chat_id]['users'][user_id]['user'] = query.from_user
     state[chat_id]['users'][user_id]['state'] = text
 
-    #values[user_id] = user_context
-    print("###")
     bot.editMessageText(text=render_ready(state[chat_id]['users']),
                         chat_id=chat_id,
                         message_id=query.message.message_id,
